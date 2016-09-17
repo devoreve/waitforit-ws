@@ -13,3 +13,7 @@
 
 $app->post('/users/auth', 'UserController@auth');
 $app->post('/users/register', 'UserController@register');
+$app->post('/reviews/create', 'ReviewController@create');
+$app->post('/reviews/{id}/update', 'ReviewController@update');
+$app->get('/reviews/movies/{id}', 'ReviewController@getByMovie');
+$app->get('/reviews', 'ReviewController@getByUser');

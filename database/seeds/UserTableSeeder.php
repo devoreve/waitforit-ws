@@ -13,6 +13,11 @@ class UserTableSeeder extends Seeder
                 'username' => 'user',
                 'email' => 'user@waitforit.dev',
                 'password' => Hash::make('user')
+            ],
+            [
+                'username' => 'demo',
+                'email' => 'demo@waitforit.dev',
+                'password' => Hash::make('demo')
             ]
         ]);
     }

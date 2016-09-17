@@ -18,7 +18,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['login', 'register']]);
+        $this->middleware('auth', ['except' => ['auth', 'register']]);
     }
 
     public function auth(Request $request)
