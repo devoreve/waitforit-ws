@@ -12,3 +12,4 @@
 */
 
 $app->post('/users/auth', 'UserController@auth');
+$app->post('/users/register', 'UserController@register');
