@@ -39,7 +39,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Invalid user']);
         }
 
-        return $token;
+        return response()->json(['token' => $token]);
     }
 
     /**
