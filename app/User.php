@@ -4,6 +4,8 @@ namespace App;
 
 use Canis\Lumen\Jwt\Contracts\Subject;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -12,9 +14,10 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
-    Subject
+    Subject,
+    CanResetPasswordContract
 {
-    use Authenticatable, Authorizable;
+    use Authenticatable, Authorizable, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.

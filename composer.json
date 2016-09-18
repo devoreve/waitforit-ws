@@ -9,7 +9,9 @@
         "laravel/lumen-framework": "5.2.*",
         "vlucas/phpdotenv": "~2.2",
         "irazasyed/jwt-auth-guard": "^1.0",
-        "canis/lumen-jwt-auth": "^1.0"
+        "canis/lumen-jwt-auth": "^1.0",
+        "guzzlehttp/guzzle": "^6.2",
+        "illuminate/mail": "5.2.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

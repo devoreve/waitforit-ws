@@ -15,5 +15,13 @@ return [
             'driver' => 'eloquent',
             'model' => App\User::class
         ]
+    ],
+    'passwords' => [
+        'users' => [
+            'provider' => 'user',
+            'email' => 'auth.emails.password',
+            'table' => 'password_resets',
+            'expire' => 60,
+        ],
     ]
 ];
