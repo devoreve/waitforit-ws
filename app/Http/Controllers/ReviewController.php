@@ -2,78 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Repositories\ReviewRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
-    public function __construct()
+    /** @var ReviewRepository $review */
+    private $review;
+
+    public function __construct(ReviewRepository $review)
     {
         $this->middleware('auth');
+        $this->review = $review;
     }
 
+    /**
+     * Return a list of reviews for a movie
+     *
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function getByMovie($id)
     {
-        $movieReviews = DB::table('reviews')
-            ->where('movie_id', $id)
-            ->get();
-
         return response()->json([
-            'results' => $movieReviews
+            'results' => $this->review->findByMovie($id)
         ]);
     }
 
+    /**
+     * Return a list of reviews of a user
+     *
+     * @param Request $request Request which may contain the movie id in order to filter by movie
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function getByUser(Request $request)
     {
-        $userReviews = DB::table('reviews')->where('user_id', Auth::user()->id);
+        $movieId = $request->has('movie_id') ? $request->get('movie_id') : null;
+        $userReviews = $this->review->findByUser(Auth::user()->id, $movieId);
 
-        if($request->has('movie_id'))
-            $userReviews->where('movie_id', $request->get('movie_id'));
-
-        return response()->json(['results' => $userReviews->get()]);
+        return response()->json(['results' => $userReviews]);
     }
 
+    /**
+     * Create a new review
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function create(Request $request)
     {
-        $review = DB::table('reviews')
-            ->where('user_id', Auth::user()->id)
-            ->where('movie_id', $request->get('movie_id'))
-            ->first();
+        $hasReviewed = $this->review->exist(Auth::user()->id, $request->get('movie_id'));
 
-        if(is_null($review))
+        if(!$hasReviewed)
         {
-            $result = DB::table('reviews')->insert([
-                'user_id' => Auth::user()->id,
-                'movie_id' => $request->get('movie_id'),
-                'status' => $request->get('status'),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-
-            return response()->json(['success' => $result]);
+            $success = $this->review->create(array_merge(['user_id' => Auth::user()->id], $request->only(['movie_id', 'status'])));
+            return response()->json(['success' => $success]);
         }
         else
         {
-            return response()->json(['success' => false, 'error' => 'A review already exists for this movie']);
+            abort(403, 'A review already exists for this movie');
         }
     }
 
+    /**
+     * Update an existing review
+     *
+     * @param $id
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function update($id, Request $request)
     {
-        $review = DB::table('reviews')
-            ->where('user_id', Auth::user()->id)
-            ->where('movie_id', $request->get('movie_id'))
-            ->first();
-
-        if(!is_null($review))
+        if($this->review->find($id) === null)
         {
-            DB::table('reviews')
-                ->where('id', $id)
-                ->update(['status' => $request->get('status'), 'updated_at' => Carbon::now()]);
+            abort(404);
+        }
 
+        $hasReviewed = $this->review->exist(Auth::user()->id, $request->get('movie_id'));
+
+        if($hasReviewed)
+        {
+            $this->review->update($request->only(['status']), $id);
             return response()->json(['success' => true]);
+        }
+        else
+        {
+            abort(403);
         }
     }
 }

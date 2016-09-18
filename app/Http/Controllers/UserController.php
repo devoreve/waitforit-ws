@@ -21,6 +21,10 @@ class UserController extends Controller
         $this->middleware('auth', ['except' => ['auth', 'register']]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function auth(Request $request)
     {
         $this->validate($request, [
@@ -38,6 +42,10 @@ class UserController extends Controller
         return $token;
     }
 
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function register(Request $request)
     {
         $this->validate($request, [
