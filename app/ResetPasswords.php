@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
 
 trait ResetPasswords
 {
@@ -145,7 +146,7 @@ trait ResetPasswords
      */
     protected function resetPassword($user, $password)
     {
-        $user->password = bcrypt($password);
+        $user->password = Hash::make($password);
 
         $user->save();
 
@@ -160,7 +161,7 @@ trait ResetPasswords
      */
     protected function getResetSuccessResponse($response)
     {
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'response' => app()->make('translator')->trans('password.'.$response)]);
     }
 
     /**
@@ -172,7 +173,7 @@ trait ResetPasswords
      */
     protected function getResetFailureResponse(Request $request, $response)
     {
-        return response()->json(['success' => false]);
+        return response()->json(['success' => false, 'response' => app()->make('translator')->trans('password.'.$response)]);
     }
 
     /**

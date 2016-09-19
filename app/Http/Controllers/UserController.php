@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use Canis\Lumen\Jwt\Token;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +60,9 @@ class UserController extends Controller
             [
                 'username' => $request->get('username'),
                 'email' => $request->get('email'),
-                'password' => Hash::make($request->get('password'))
+                'password' => Hash::make($request->get('password')),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]
         ]);
 
