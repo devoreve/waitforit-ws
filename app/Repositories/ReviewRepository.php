@@ -19,6 +19,21 @@ class ReviewRepository
     }
 
     /**
+     * Return a review with user_id and movie_id
+     *
+     * @param $userId
+     * @param $movieId
+     * @return \Stdclass|null
+     */
+    public function findWithUserAndMovie($userId, $movieId)
+    {
+        return DB::table('reviews')
+            ->where('user_id', $userId)
+            ->where('movie_id', $movieId)
+            ->first();
+    }
+
+    /**
      * Return a list of reviews of a movie
      *
      * @param $movieId
@@ -70,13 +85,13 @@ class ReviewRepository
      * Update an existing review
      *
      * @param array $data
-     * @param $id
+     * @param array $id The fiels and values to identify a review
      * @return int
      */
-    public function update(array $data, $id)
+    public function update(array $data, array $id)
     {
         return DB::table('reviews')
-            ->where('id', $id)
+            ->where($id)
             ->update(['status' => $data['status'], 'updated_at' => Carbon::now()]);
     }
 

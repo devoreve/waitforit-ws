@@ -83,7 +83,7 @@ class ReviewController extends Controller
 
         if($hasReviewed)
         {
-            $this->review->update($request->only(['status']), $id);
+            $this->review->update($request->only(['status']), ['id' => $id]);
             return response()->json(['success' => true]);
         }
         else
@@ -105,13 +105,15 @@ class ReviewController extends Controller
             'status' => 'required|integer'
         ]);
 
-        if($request->has('review_id'))
+        $review = $this->review->findWithUserAndMovie(Auth::user()->id, $request->get('movie_id'));
+
+        if($review === null)
         {
-            return $this->edit($request);
+            return $this->add($request);
         }
         else
         {
-            return $this->add($request);
+            return $this->edit($review, $request);
         }
     }
 
@@ -121,34 +123,22 @@ class ReviewController extends Controller
      */
     protected function add(Request $request)
     {
-        if($this->review->exist(Auth::user()->id, $request->get('movie_id')))
-        {
-            abort(403, 'A review already exists for this movie');
-        }
-
         $success = $this->review->create(array_merge(['user_id' => Auth::user()->id], $request->only(['movie_id', 'status'])));
         return response()->json(['success' => $success]);
     }
 
     /**
+     * @param \StdClass $review
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function edit(Request $request)
+    protected function edit($review, Request $request)
     {
-        $review = $this->review->find($request->get('review_id'));
+        $this->review->update($request->only(['status']), [
+            'user_id' => Auth::user()->id,
+            'movie_id' => $review->movie_id
+        ]);
 
-        if($review === null)
-        {
-            abort(404);
-        }
-
-        if($review->user_id != Auth::user()->id)
-        {
-            abort(403);
-        }
-
-        $this->review->update($request->only(['status']), $request->get('review_id'));
         return response()->json(['success' => true]);
     }
 }
