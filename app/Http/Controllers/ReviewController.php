@@ -91,4 +91,64 @@ class ReviewController extends Controller
             abort(403);
         }
     }
+
+    /**
+     * Create or update a review, depending on if the review_id is sent in the request
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function save(Request $request)
+    {
+        $this->validate($request, [
+            'movie_id' => 'required|integer',
+            'status' => 'required|integer'
+        ]);
+
+        if($request->has('review_id'))
+        {
+            return $this->edit($request);
+        }
+        else
+        {
+            return $this->add($request);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function add(Request $request)
+    {
+        if($this->review->exist(Auth::user()->id, $request->get('movie_id')))
+        {
+            abort(403, 'A review already exists for this movie');
+        }
+
+        $success = $this->review->create(array_merge(['user_id' => Auth::user()->id], $request->only(['movie_id', 'status'])));
+        return response()->json(['success' => $success]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function edit(Request $request)
+    {
+        $review = $this->review->find($request->get('review_id'));
+
+        if($review === null)
+        {
+            abort(404);
+        }
+
+        if($review->user_id != Auth::user()->id)
+        {
+            abort(403);
+        }
+
+        $this->review->update($request->only(['status']), $request->get('review_id'));
+        return response()->json(['success' => true]);
+    }
 }

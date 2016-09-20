@@ -17,6 +17,7 @@ $app->post('/reviews/create', 'ReviewController@create');
 $app->post('/reviews/{id}/update', 'ReviewController@update');
 $app->get('/reviews/movies/{id}', 'ReviewController@getByMovie');
 $app->get('/reviews', 'ReviewController@getByUser');
+$app->post('/reviews/save', 'ReviewController@save');
 $app->post('/password/forget', 'PasswordController@postEmail');
 $app->get('/password/reset/{token}', 'PasswordController@getResetForm');
 $app->post('/password/reset', ['uses' => 'PasswordController@postReset', 'as' => 'password.reset']);
