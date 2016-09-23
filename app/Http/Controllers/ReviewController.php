@@ -13,7 +13,7 @@ class ReviewController extends Controller
 
     public function __construct(ReviewRepository $review)
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['getByMovie']]);
         $this->review = $review;
     }
 
